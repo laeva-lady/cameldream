@@ -1,0 +1,4 @@
+(executable
+ (public_name cameldream)
+ (name main)
+ (libraries cameldream unix))
