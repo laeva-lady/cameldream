@@ -3,7 +3,7 @@
 > [!NOTE]
 > This is a rewrite of [welldream](https://github.com/laeva-lady/welldream)
 >
-> code was messy and i didn't like go's messyness that much
+> code was a mess and go's has an annoying syntax
 
 > [!WARNING]
 > This project only supports Hyprland
@@ -13,7 +13,7 @@ Log and display your app usage
 ![Example usage](imgs/example_usage.png)
 
 ## Usage
-Refer to `cameldream --help`
+Refer to `cameldream help`
 
 ## Cache
 It keeps cache here `~/.cache/wellness`
