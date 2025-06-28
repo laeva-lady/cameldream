@@ -50,7 +50,3 @@ binary will be put here `~/.local/bin/cameldream`
 ## todo
  - [ ] add weekly report
  - [ ] add monthy report
- - [x] add sorting
- - [x] change sorting to sort by most used app instead of alphabetically
- - [x] IMPORTANT: switch to using Hyprland's IPC instead of polling every second
- - [ ] add web front end

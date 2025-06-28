@@ -4,6 +4,15 @@ type time =
   ; seconds : int
   }
 
+let compare_time (t1 : time) (t2 : time) : int =
+  match compare t1.hour t2.hour with
+  | 0 ->
+    (match compare t1.minutes t2.minutes with
+     | 0 -> compare t1.seconds t2.seconds
+     | c -> c)
+  | c -> c
+;;
+
 let add_time t1 t2 =
   let total_seconds = t1.seconds + t2.seconds in
   let carry_minutes, seconds = total_seconds / 60, total_seconds mod 60 in
@@ -123,6 +132,7 @@ let print_processInfo pinfos =
     reset;
   Printf.printf "%s\n" line;
   pinfos
+  |> List.sort (fun (x : processInfo) (y : processInfo) -> compare_time y.active_time x.active_time)
   |> List.iter (fun pinfo ->
     let str_info = processInfo_2_processInfo_str pinfo in
     Printf.printf
