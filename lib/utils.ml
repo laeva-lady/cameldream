@@ -22,7 +22,6 @@ let create_file_if_not_exists filename =
   | Sys_error _ -> ()
 ;;
 
-(* to do *)
 let writecsv path_to_csv (pinfos : Datas.processInfo list) =
   let oc = open_out path_to_csv in
   Datas.processInfo_list_2_string_list pinfos
@@ -35,9 +34,10 @@ type flags =
   { help : bool
   ; server : bool
   ; watch : bool
+  ; monthly : bool
   }
 
-let new_flag h s w = { help = h; server = s; watch = w }
+let new_flag h s w m = { help = h; server = s; watch = w; monthly = m}
 
 let handle_flags args =
   let helpq = Array.exists (fun x -> x = "help") args in
@@ -45,14 +45,14 @@ let handle_flags args =
   then (
     let startserver = ref false in
     let startwatch = ref false in
+    let isMonthly = ref false in
     args
     |> Array.iter (fun arg ->
       match arg with
       | "server" -> startserver := true
       | "watch" -> startwatch := true
+      | "month" -> isMonthly := true
       | _ -> ());
-    !startwatch |> string_of_bool |> print_endline;
-    !startserver |> string_of_bool |> print_endline;
-    new_flag false !startserver !startwatch)
-  else new_flag true false false
+    new_flag false !startserver !startwatch !isMonthly)
+  else new_flag true false false false
 ;;

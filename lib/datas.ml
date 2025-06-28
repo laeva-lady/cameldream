@@ -41,6 +41,13 @@ let new_processInfo title =
   }
 ;;
 
+let merge_process_info p1 p2 =
+  { name = p1.name
+  ; usage_time = add_time p1.usage_time p2.usage_time
+  ; active_time = add_time p1.active_time p2.active_time
+  }
+;;
+
 let list2time xs =
   xs
   |> List.map int_of_string
@@ -132,7 +139,8 @@ let print_processInfo pinfos =
     reset;
   Printf.printf "%s\n" line;
   pinfos
-  |> List.sort (fun (x : processInfo) (y : processInfo) -> compare_time y.active_time x.active_time)
+  |> List.sort (fun (x : processInfo) (y : processInfo) ->
+    compare_time y.active_time x.active_time)
   |> List.iter (fun pinfo ->
     let str_info = processInfo_2_processInfo_str pinfo in
     Printf.printf

@@ -1,5 +1,5 @@
 let oneTime () =
-  let date = Dates.get_date in
+  let date = Dates.get_date () in
   Utils.getPath () ^ date ^ ".csv"
   |> Utils.readcsv
   |> Datas.print_processInfo
@@ -7,7 +7,7 @@ let oneTime () =
 
 let rec watch () =
   print_endline "\027[H\027[2J";
-  let date = Dates.get_date in
+  let date = Dates.get_date () in
   Utils.getPath () ^ date ^ ".csv"
   |> Utils.readcsv
   |> Datas.print_processInfo;
