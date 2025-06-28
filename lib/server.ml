@@ -46,7 +46,6 @@ let rec update_data_loop () =
   Utils.create_file_if_not_exists file;
   let clients : string list = Clients.get_clients () in
   let current_client = !active_window in
-  print_endline current_client;
   (* Handles the data *)
   Utils.readcsv file
   |> Clients.add_clients clients

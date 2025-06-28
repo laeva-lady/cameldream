@@ -25,7 +25,7 @@ let get_active_client () =
   let desk_env = Sys.getenv "XDG_CURRENT_DESKTOP" in
   match desk_env with
   | "Hyprland" ->
-    get_output_single_line "hyprctl activewindow | grep \"class:\\s\" | awk '{print $2}'"
+    get_output_single_line "hyprctl activewindow | awk -F'class: ' '/class: / {print $2}'"
   | _ -> failwith "Only Hyprland is supported"
 ;;
 
@@ -33,8 +33,7 @@ let get_clients () =
   let desk_env = Sys.getenv "XDG_CURRENT_DESKTOP" in
   match desk_env with
   | "Hyprland" ->
-    let results = get_output "hyprctl clients | awk -F'class: ' '/class: / {print $2}'
-" in
+    let results = get_output "hyprctl clients | awk -F'class: ' '/class: / {print $2}'" in
     String.split_on_char '\n' results |> List.sort_uniq compare
   | _ -> failwith "Only Hyprland is supported"
 ;;
