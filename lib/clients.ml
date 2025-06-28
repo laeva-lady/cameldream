@@ -33,11 +33,24 @@ let get_clients () =
   let desk_env = Sys.getenv "XDG_CURRENT_DESKTOP" in
   match desk_env with
   | "Hyprland" ->
-    let results = get_output "hyprctl clients | grep \"class:\\s\" | awk '{print $2}'" in
+    let results = get_output "hyprctl clients | awk -F'class: ' '/class: / {print $2}'
+" in
     String.split_on_char '\n' results |> List.sort_uniq compare
   | _ -> failwith "Only Hyprland is supported"
 ;;
 
 let contains_client (title : string) (pinfos : Datas.processInfo list) =
   pinfos |> List.exists (fun (pinfo : Datas.processInfo) -> pinfo.name = title)
+;;
+
+let add_clients (clients : string list) (contents : Datas.processInfo list) =
+  let existing_names =
+    List.map (fun (pinfo : Datas.processInfo) -> pinfo.name) contents
+  in
+  let new_clients =
+    clients
+    |> List.filter (fun name -> not (List.mem name existing_names))
+    |> List.map Datas.new_processInfo
+  in
+  contents @ new_clients
 ;;

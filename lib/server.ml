@@ -33,48 +33,50 @@ let rec socketloop_activewindow sock =
 let cacheDir = Utils.getPath ()
 
 let rec update_data_loop () =
-  let date = Dates.get_date in
+  let now = Unix.gettimeofday () in
+  let times = Unix.localtime now in
+  let date =
+    Printf.sprintf
+      "%02d-%02d-%02d"
+      (times.tm_year + 1900)
+      (times.tm_mon + 1)
+      times.tm_mday
+  in
   let file = cacheDir ^ date ^ ".csv" in
   Utils.create_file_if_not_exists file;
-  let data = Utils.readcsv file in
   let clients : string list = Clients.get_clients () in
   let current_client = !active_window in
-  let data =
-    if Clients.contains_client current_client data || current_client = ""
-    then data
-    else Datas.new_processInfo current_client :: data
-  in
-  let data =
-    data
+  print_endline current_client;
+  (* Handles the data *)
+  Utils.readcsv file
+  |> Clients.add_clients clients
+  |> List.map (fun (pinfo : Datas.processInfo) ->
     (* usage time / clients *)
-    |> List.map (fun (pinfo : Datas.processInfo) ->
-      if List.exists (fun client -> pinfo.name = client) clients
-      then (
-        let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
-        let new_pinfo : Datas.processInfo =
-          { name = pinfo.name
-          ; usage_time = Datas.add_time pinfo.usage_time one_second
-          ; active_time = pinfo.active_time
-          }
-        in
-        new_pinfo)
-      else pinfo)
+    if List.exists (fun client -> pinfo.name = client) clients
+    then (
+      let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
+      let new_pinfo : Datas.processInfo =
+        { name = pinfo.name
+        ; usage_time = Datas.add_time pinfo.usage_time one_second
+        ; active_time = pinfo.active_time
+        }
+      in
+      new_pinfo)
+    else pinfo)
+  |> List.map (fun (pinfo : Datas.processInfo) ->
     (* active time / current client *)
-    |> List.map (fun (pinfo : Datas.processInfo) ->
-      if pinfo.name = current_client
-      then (
-        let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
-        let new_pinfo : Datas.processInfo =
-          { name = pinfo.name
-          ; usage_time = pinfo.usage_time
-          ; active_time = Datas.add_time pinfo.active_time one_second
-          }
-        in
-        new_pinfo)
-      else pinfo)
-  in
-  Utils.writecsv file data;
-
+    if pinfo.name = current_client
+    then (
+      let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
+      let new_pinfo : Datas.processInfo =
+        { name = pinfo.name
+        ; usage_time = pinfo.usage_time
+        ; active_time = Datas.add_time pinfo.active_time one_second
+        }
+      in
+      new_pinfo)
+    else pinfo)
+  |> Utils.writecsv file;
   Unix.sleep 1;
   update_data_loop ()
 ;;
@@ -97,6 +99,5 @@ let start_socket_server () =
   *)
   let _activewindow_thread = Thread.create (fun () -> socketloop_activewindow sock) () in
   let _update_stuff_thread = Thread.create (fun () -> update_data_loop ()) () in
-
   wait_forever ()
 ;;

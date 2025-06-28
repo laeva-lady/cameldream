@@ -9,10 +9,9 @@ let print_help () =
 
 let () =
   let args = Sys.argv in
-  let command = if Array.length args >= 2 then Some args.(1) else None in
-  match command with
-  | Some "server" -> Cameldream.Server.start_socket_server ()
-  | Some "watch" -> Cameldream.Client.watch ()
-  | Some "--help" -> print_help ()
-  | _ -> Cameldream.Client.oneTime ()
+  if Array.exists (fun x -> x = "server") args
+  then Cameldream.Server.start_socket_server ();
+  if Array.exists (fun x -> x = "watch") args then Cameldream.Client.watch ();
+  if Array.exists (fun x -> x = "help") args then print_help ();
+  if Array.length args = 1 then Cameldream.Client.oneTime ()
 ;;
