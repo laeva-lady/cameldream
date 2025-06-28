@@ -13,9 +13,7 @@ Log and display your app usage
 ![Example usage](imgs/example_usage.png)
 
 ## Usage
-- `cameldream server` spawns the server
-- `cameldream watch` prints the usage in a loop
-- `cameldream` only prints the usage once
+Refer to `cameldream --help`
 
 ## Cache
 It keeps cache here `~/.cache/wellness`
