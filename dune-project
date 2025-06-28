@@ -5,15 +5,11 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github laeva-lady/cameldream))
 
-(authors "Author Name <author@example.com>")
-
-(maintainers "Maintainer Name <maintainer@example.com>")
+(authors "Lyna (laeva-lady")
 
 (license LICENSE)
-
-(documentation https://url/to/documentation)
 
 (package
  (name cameldream)
