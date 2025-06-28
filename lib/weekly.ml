@@ -1,0 +1,2 @@
+let weekly () = ()
+let watchweekly () = ()
