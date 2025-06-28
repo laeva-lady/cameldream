@@ -95,6 +95,7 @@ let sum_process (f : processInfo -> time) (pinfos : processInfo list) : time =
 ;;
 
 let blue = "\027[34m"
+let active_color = "\027[0;95m"
 let green = "\027[32m"
 let red = "\027[31m"
 let reset = "\027[0m"
@@ -146,7 +147,7 @@ let print_processInfo pinfos =
     Printf.printf
       "%s|%s%-30s%s%s%20s%s%s%30s%s|%s\n"
       red
-      blue
+      (if pinfo.name = "kitty" then active_color else blue)
       str_info.name
       reset
       green

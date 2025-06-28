@@ -49,9 +49,11 @@ binary will be put here `~/.local/bin/cameldream`
 
 ## todo
  - [/] CANCELED(because too much of a pain tbh); add weekly report
- - [ ] add monthy report
+ - [x] add monthy report
+ - [ ] display current active window in the output
 
 ### monthly
 - [ ] combines daily data of the month
 - [ ] save that data to cache/month
+
 
