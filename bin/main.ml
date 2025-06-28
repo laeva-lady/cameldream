@@ -1,17 +1,30 @@
 let print_help () =
   Printf.printf "Usage:\n";
-  Printf.printf "  cameldream <command>\n\n";
+  Printf.printf "\tcameldream <command>\n\n";
   Printf.printf "Commands:\n";
-  Printf.printf "  server       Start the server\n";
-  Printf.printf "  watch        Print the usage in a loop\n\n";
+  Printf.printf "\tserver       Start the server\n";
+  Printf.printf "\twatch        Print the usage in a loop\n";
+  Printf.printf "\thelp         Print this message (cannot be used with other commands)\n\n";
+  Printf.printf "\t(more than one command can be added, no need to be in a specific order either:\n";
+  Printf.printf "\te.g. `cameldream server watch`)\n\n";
   Printf.printf "If no command or an unknown command is passed, usage will be printed.\n"
 ;;
 
 let () =
-  let args = Sys.argv in
-  if Array.exists (fun x -> x = "server") args
-  then Cameldream.Server.start_socket_server ();
-  if Array.exists (fun x -> x = "watch") args then Cameldream.Client.watch ();
-  if Array.exists (fun x -> x = "help") args then print_help ();
-  if Array.length args = 1 then Cameldream.Client.oneTime ()
+  let flags = Cameldream.Utils.handle_flags Sys.argv in
+  if flags.help
+  then print_help ()
+  else (
+    let threads = ref [] in
+    if flags.server
+    then (
+      let t = Thread.create (fun () -> Cameldream.Server.start_socket_server ()) () in
+      threads := t :: !threads);
+    if flags.watch
+    then (
+      let t = Thread.create (fun () -> Cameldream.Client.watch ()) () in
+      threads := t :: !threads);
+    if flags.server || flags.watch
+    then List.iter Thread.join !threads
+    else Cameldream.Client.oneTime ())
 ;;
