@@ -3,7 +3,7 @@
 > [!NOTE]
 > This is a rewrite of [welldream](https://github.com/laeva-lady/welldream)
 >
-> code was a mess and go's has an annoying syntax
+> code was a mess and go has an annoying syntax
 
 > [!WARNING]
 > This project only supports Hyprland
