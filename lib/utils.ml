@@ -1,8 +1,9 @@
-let readcsv path_to_csv : Datas.processInfo list =
+let readcsv path_to_csv : (Datas.processInfo * bool) list =
   let input = Csv.load path_to_csv in
   input
   |> List.map (fun row ->
-    row |> Datas.list2processInfo_str |> Datas.processInfo_str_2_processInfo)
+    let pstr, b = Datas.list2processInfo_str row in
+    Datas.processInfo_str_2_processInfo pstr, b)
 ;;
 
 let getPath () =
@@ -22,7 +23,7 @@ let create_file_if_not_exists filename =
   | Sys_error _ -> ()
 ;;
 
-let writecsv path_to_csv (pinfos : Datas.processInfo list) =
+let writecsv path_to_csv (pinfos : (Datas.processInfo * bool) list) =
   let oc = open_out path_to_csv in
   Datas.processInfo_list_2_string_list pinfos
   |> List.iter (fun s -> Printf.fprintf oc "%s\n" s);
@@ -37,7 +38,7 @@ type flags =
   ; monthly : bool
   }
 
-let new_flag h s w m = { help = h; server = s; watch = w; monthly = m}
+let new_flag h s w m = { help = h; server = s; watch = w; monthly = m }
 
 let handle_flags args =
   let helpq = Array.exists (fun x -> x = "help") args in

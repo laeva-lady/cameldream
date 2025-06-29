@@ -67,10 +67,10 @@ let processInfo_str_2_processInfo (pis : processInfo_str) =
   }
 ;;
 
-let list2processInfo_str xs : processInfo_str =
+let list2processInfo_str xs : processInfo_str * bool =
   match xs with
-  | [ a; b; c ] -> { name = a; usage_time = b; active_time = c }
-  | _ -> failwith "List must have exactly 3 elements"
+  | [ a; b; c; d ] -> { name = a; usage_time = b; active_time = c }, d = "active"
+  | _ -> failwith "List must have exactly 3/4 elements"
 ;;
 
 let processInfo_2_processInfo_str (pis : processInfo) : processInfo_str =
@@ -80,16 +80,22 @@ let processInfo_2_processInfo_str (pis : processInfo) : processInfo_str =
   }
 ;;
 
-let processInfo_list_2_string_list (ps : processInfo list) =
+let processInfo_list_2_string_list (ps : (processInfo * bool) list) =
   ps
-  |> List.map (fun (p : processInfo) ->
-    let str_info = processInfo_2_processInfo_str p in
-    str_info.name ^ "," ^ str_info.usage_time ^ "," ^ str_info.active_time)
+  |> List.map (fun (p : processInfo * bool) ->
+    let str_info = processInfo_2_processInfo_str (fst p) in
+    str_info.name
+    ^ ","
+    ^ str_info.usage_time
+    ^ ","
+    ^ str_info.active_time
+    ^ ","
+    ^ if snd p then "active" else "")
 ;;
 
-let sum_process (f : processInfo -> time) (pinfos : processInfo list) : time =
+let sum_process (f : processInfo -> time) (pinfos : (processInfo * bool) list) : time =
   List.fold_left
-    (fun acc pinfo -> add_time acc (f pinfo))
+    (fun acc pinfo -> add_time acc (f (fst pinfo)))
     { hour = 0; minutes = 0; seconds = 0 }
     pinfos
 ;;
@@ -108,7 +114,7 @@ let pad_total = width - String.length text - 2 (* for the pipes *)
 let pad_left = pad_total / 2
 let pad_right = pad_total - pad_left
 
-let print_processInfo pinfos =
+let print_processInfo (pinfos : (processInfo * bool) list) =
   Printf.printf "\027[H\027[2J";
   let line = red ^ "|" ^ String.make 80 '-' ^ red ^ "|" ^ reset in
   Printf.printf "%s\n" line;
@@ -140,14 +146,14 @@ let print_processInfo pinfos =
     reset;
   Printf.printf "%s\n" line;
   pinfos
-  |> List.sort (fun (x : processInfo) (y : processInfo) ->
-    compare_time y.active_time x.active_time)
-  |> List.iter (fun pinfo ->
-    let str_info = processInfo_2_processInfo_str pinfo in
+  |> List.sort (fun (x : processInfo * bool) (y : processInfo * bool) ->
+    compare_time (fst y).active_time (fst x).active_time)
+  |> List.iter (fun (pinfo : processInfo * bool) ->
+    let str_info = processInfo_2_processInfo_str (fst pinfo) in
     Printf.printf
       "%s|%s%-30s%s%s%20s%s%s%30s%s|%s\n"
       red
-      (if pinfo.name = "kitty" then active_color else blue)
+      (if snd pinfo then active_color else blue)
       str_info.name
       reset
       green

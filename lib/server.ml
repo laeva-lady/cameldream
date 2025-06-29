@@ -49,36 +49,39 @@ let rec update_data_loop () =
   (* Handles the data *)
   Utils.readcsv file
   |> Clients.add_clients clients
-  |> List.map (fun (pinfo : Datas.processInfo) ->
+  |> List.map (fun (pinfo : Datas.processInfo * bool) ->
     (* usage time / clients *)
-    if List.exists (fun client -> pinfo.name = client) clients
+    if List.exists (fun client -> (fst pinfo).name = client) clients
     then (
       let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
       let new_pinfo : Datas.processInfo =
-        { name = pinfo.name
-        ; usage_time = Datas.add_time pinfo.usage_time one_second
-        ; active_time = pinfo.active_time
+        { name = (fst pinfo).name
+        ; usage_time = Datas.add_time (fst pinfo).usage_time one_second
+        ; active_time = (fst pinfo).active_time
         }
       in
-      new_pinfo)
+      new_pinfo, false)
     else pinfo)
-  |> List.map (fun (pinfo : Datas.processInfo) ->
+  |> List.map (fun (pinfo : Datas.processInfo * bool) ->
     (* active time / current client *)
-    if pinfo.name = current_client
+    if (fst pinfo).name = current_client
     then (
       let one_second : Datas.time = { hour = 0; minutes = 0; seconds = 1 } in
       let new_pinfo : Datas.processInfo =
-        { name = pinfo.name
-        ; usage_time = pinfo.usage_time
-        ; active_time = Datas.add_time pinfo.active_time one_second
+        { name = (fst pinfo).name
+        ; usage_time = (fst pinfo).usage_time
+        ; active_time = Datas.add_time (fst pinfo).active_time one_second
         }
       in
-      new_pinfo)
+      new_pinfo, false)
     else pinfo)
+  |> List.map (fun (pinfopt : Datas.processInfo * bool) ->
+    fst pinfopt, (fst pinfopt).name = current_client)
   |> Utils.writecsv file;
   Unix.sleep 1;
   update_data_loop ()
 ;;
+
 
 let rec wait_forever () =
   Thread.delay 5.0;

@@ -1,6 +1,9 @@
 let get_output_single_line cmd =
   let ic = Unix.open_process_in cmd in
-  let result = input_line ic in
+  let result =
+    try input_line ic with
+    | End_of_file -> ""
+  in
   let _ = Unix.close_process_in ic in
   result
 ;;
@@ -42,14 +45,16 @@ let contains_client (title : string) (pinfos : Datas.processInfo list) =
   pinfos |> List.exists (fun (pinfo : Datas.processInfo) -> pinfo.name = title)
 ;;
 
-let add_clients (clients : string list) (contents : Datas.processInfo list) =
+let add_clients (clients : string list) (contents : (Datas.processInfo * bool) list) =
   let existing_names =
-    List.map (fun (pinfo : Datas.processInfo) -> pinfo.name) contents
+    List.map (fun (pinfo : Datas.processInfo * bool) -> (fst pinfo).name) contents
   in
   let new_clients =
     clients
     |> List.filter (fun name -> not (List.mem name existing_names))
-    |> List.map Datas.new_processInfo
+    |> List.map (fun x ->
+      let pinfo = Datas.new_processInfo x in
+      pinfo, false)
   in
   contents @ new_clients
 ;;

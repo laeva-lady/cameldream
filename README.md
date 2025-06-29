@@ -44,16 +44,3 @@ binary will be put here `~/.local/bin/cameldream`
 2. then put the file in `~/.config/systemd/user`
 3. then reload systemd daemon if needed `systemctl --user daemon-reload`
 3. then start the service `systemctl --user start cameldream.service`
-
-
-
-## todo
- - [/] CANCELED(because too much of a pain tbh); add weekly report
- - [x] add monthy report
- - [ ] display current active window in the output
-
-### monthly
-- [ ] combines daily data of the month
-- [ ] save that data to cache/month
-
-

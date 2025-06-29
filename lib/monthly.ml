@@ -22,15 +22,18 @@ let add_dailys () =
     get_files_prefix (get_path "daily") (get_month ())
     (* get the data of daily's files*)
     |> List.map (fun x -> get_path "daily" ^ x)
-    |> List.map Utils.readcsv (* pinfo list list *)
+    |> List.map Utils.readcsv (* (pinfo * bool) list list *)
     |> List.flatten
     |> List.fold_left
-         (fun acc (pinfo : Datas.processInfo) ->
-            let name = pinfo.name in
+         (fun (acc : (Datas.processInfo * bool) StringMap.t)
+           (pinfo : Datas.processInfo * bool) ->
+            let name = (fst pinfo).name in
             let combined =
               match StringMap.find_opt name acc with
-              | Some existing -> Datas.merge_process_info existing pinfo
-              | None -> pinfo
+              | Some existing ->
+                Datas.merge_process_info (fst existing) (fst pinfo),
+                snd existing || snd pinfo
+              | None -> (fst pinfo, snd pinfo)
             in
             StringMap.add name combined acc)
          StringMap.empty
@@ -48,4 +51,3 @@ let rec watch () =
   Thread.delay 1.;
   watch ()
 ;;
-
